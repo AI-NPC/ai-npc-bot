@@ -1,0 +1,33 @@
+{
+  "name": "ai-npc-bot",
+  "version": "1.0.0",
+  "description": "AI-NPC discord bot",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "start": "npm run clean && npm run build && node dist/index.js",
+    "update-npc3": "rm -rf node_modules/@ai-npc/npc3 && npm i @ai-npc/npc3@latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AI-NPC/ai-npc-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AI-NPC/ai-npc-bot/issues"
+  },
+  "homepage": "https://github.com/AI-NPC/ai-npc-bot#readme",
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.4"
+  },
+  "dependencies": {
+    "@ai-npc/npc3": "^0.0.16",
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3"
+  }
+}
