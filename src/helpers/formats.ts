@@ -1,15 +1,10 @@
+import { GameContext } from "@ai-npc/npc3";
 export function formatArray(arr: string[]): string {
   if (arr.length === 0) return "";
   if (arr.length === 1) return arr[0];
   if (arr.length === 2) return arr.join(" and ");
   return arr.slice(0, -1).join(", ") + ", and " + arr.slice(-1);
 }
-
-// transform the following string into an object:
-// <npc_first_sentence> Greetings, traveler! How may I help you?
-// A: I need assistance completing a quest.
-// B: I am in need of magical assistance.
-// C: I am looking to purchase magical items.
 
 export const extractNPCAnswer = (
   answer: string
@@ -27,4 +22,31 @@ export const extractNPCAnswer = (
   };
 
   return obj;
+};
+
+export const displayContext = (gameContext: GameContext) =>
+  `${`The game is set in a ${gameContext.setting} world. The tone is ${
+    gameContext.tone
+  }. The objectives include ${gameContext.objectives.join(
+    ", "
+  )}. The setting takes inspiration from ${gameContext.details.join(
+    ", "
+  )}.`}\n\n`;
+
+export const parseContext = (contextString: string): GameContext => {
+  const [settingsLine, toneLine, objectivesLine, inspirationLine] =
+    contextString.split(".");
+  console.log(settingsLine, toneLine, objectivesLine, inspirationLine);
+
+  const setting = settingsLine.split(" ").slice(6, 7).join(" ");
+  const tone = toneLine.split(" ").slice(4, 5).join(" ");
+  const objectives = objectivesLine.split(" ").slice(4).join(" ").split(", ");
+  const details = inspirationLine.split(" ").slice(6).join(" ").split(", ");
+
+  return {
+    setting,
+    tone,
+    objectives,
+    details,
+  };
 };

@@ -1,4 +1,4 @@
-import { TEST_GAME_CONTEXT } from "./../../helpers/constants";
+import { NPC, Approach } from "@ai-npc/npc3";
 import { Button } from "../../../types";
 import {
   ColorResolvable,
@@ -6,25 +6,26 @@ import {
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
+  ButtonBuilder,
+  ButtonStyle,
 } from "discord.js";
-import { NPC_ANSWER } from "../../helpers/prompts";
-import { extractNPCAnswer } from "../../helpers/formats";
+import { getContextFromEmbedAuthor } from "../../helpers/utils";
 
 async function embedAnswer(
-  npc: { name: string; description: string },
-  answer: { npc: string; choices: string[] },
+  npc: NPC,
+  approach: Approach,
   color: ColorResolvable,
-  interaction: ButtonInteraction
+  interaction: ButtonInteraction,
+  contextId: string
 ) {
   let Embed = new EmbedBuilder()
     .setColor(color)
-    .setDescription(`${npc.description}`)
     .setAuthor({
-      name: npc.name,
+      name: contextId,
     })
     .addFields({
       name: npc.name,
-      value: answer.npc,
+      value: approach.message,
     });
 
   const row: any = new ActionRowBuilder().addComponents(
@@ -32,7 +33,7 @@ async function embedAnswer(
       .setCustomId("answer")
       .setPlaceholder(`Answer to ${npc.name}...`)
       .addOptions(
-        answer.choices.map((choice, index: number) => ({
+        approach.choices.map((choice) => ({
           label: choice || "Failed to generate answer",
           value: choice || "Failed to generate answer",
           description:
@@ -41,32 +42,43 @@ async function embedAnswer(
       )
   );
 
+  const buttonRow: any = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel(`${npc.name} profile`)
+      .setURL(interaction.message.url)
+  );
+
   await interaction.followUp({
+    content: `<@${interaction.user.id}>`,
     embeds: [Embed],
-    components: [row],
+    components: [row, buttonRow],
   });
 }
 
 module.exports = {
   id: "talk",
   async execute(interaction: ButtonInteraction) {
-    let id = interaction.customId;
+    const { client } = interaction;
+    let npcId = Number(interaction.customId.split("-")[1]);
+
     let npc = {
-      name: interaction.message.embeds[0].author.name,
-      description: interaction.message.embeds[0].description,
+      name: interaction.message.embeds[0].fields[npcId].name,
+      description: interaction.message.embeds[0].fields[npcId].value,
     };
-    if (["talk"].includes(id)) id = "talk";
-    let prompt = NPC_ANSWER(npc, TEST_GAME_CONTEXT);
+    let contextId = `${npcId}-${interaction.message.id}`;
     await interaction.deferReply();
-
-    const output = await interaction.client.npc3.generateAnswer({
-      prompt: prompt,
+    let data: any = await getContextFromEmbedAuthor(contextId, interaction);
+    const approach: Approach = await client.npc3.approach({
+      gameContext: data.gameContext,
+      npc: data.npc,
     });
-    console.log(prompt);
-    console.log(output);
-    let answer = extractNPCAnswer(output);
-    console.log(answer);
-
-    embedAnswer(npc, answer, interaction.message.embeds[0].color, interaction);
+    await embedAnswer(
+      npc,
+      approach,
+      interaction.message.embeds[0].color,
+      interaction,
+      contextId
+    );
   },
 } as Button;

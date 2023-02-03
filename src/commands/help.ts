@@ -2,10 +2,10 @@ import { SlashCommandBuilder, EmbedBuilder } from "discord.js";
 import { Command } from "../../types";
 
 export const command: Command = {
-  name: "ping",
+  name: "help",
   data: new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Affoche le ping du bot"),
+    .setName("help")
+    .setDescription("Display all usable commands"),
   execute: async (interaction) => {
     await interaction.reply({
       embeds: [
@@ -14,7 +14,6 @@ export const command: Command = {
           .setDescription(`🏓 Pong! \n 📡 Ping: ${interaction.client.ws.ping}`)
           .setColor("#ff8e4d"),
       ],
-      ephemeral: true,
     });
   },
 };

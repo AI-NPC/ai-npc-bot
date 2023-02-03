@@ -6,11 +6,19 @@ import {
   ButtonInteraction,
   StringSelectMenuInteraction,
 } from "discord.js";
+import { ReplyFunction } from "./src/functions/reply";
+import { EmbedifyFunction } from "./src/functions/embedify";
 
 export interface BotEvent {
   name: string;
   once?: boolean | false;
   execute: (...args: any) => void;
+}
+
+export interface BotFunctions {
+  reply: ReplyFunction;
+  parseTxt: (txt: string) => string;
+  embedify: EmbedifyFunction;
 }
 
 export interface Command {
@@ -42,6 +50,7 @@ declare global {
 declare module "discord.js" {
   export interface Client {
     commands: Collection<string, Command>;
+    functions: BotFunctions;
     npc3: NPC3;
   }
 }

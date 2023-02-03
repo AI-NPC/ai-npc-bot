@@ -1,16 +1,15 @@
-import { TEST_GAME_CONTEXT } from "./../../helpers/constants";
+import { getContextFromEmbedAuthor } from "./../../helpers/utils";
 import { Button, Select } from "../../../types";
 import {
   ColorResolvable,
-  ButtonInteraction,
   EmbedBuilder,
   ActionRowBuilder,
   StringSelectMenuBuilder,
   StringSelectMenuInteraction,
   EmbedField,
+  ButtonBuilder,
+  ButtonStyle,
 } from "discord.js";
-import { NPC_ANSWER, NPC_QUESTION } from "../../helpers/prompts";
-import { extractNPCAnswer } from "../../helpers/formats";
 
 export type Message = {
   sender: "npc" | "player";
@@ -19,22 +18,20 @@ export type Message = {
 
 async function embedAnswer(
   npc: { name: string; description: string },
-  answer: { npc: string; choices: string[] },
+  choices: string[],
   color: ColorResolvable,
   interaction: StringSelectMenuInteraction,
-  messages: Message[]
+  messages: Message[],
+  npcUrl: string
 ) {
-  let Embed = new EmbedBuilder()
-    .setColor(color)
-    .setDescription(`${npc.description}`)
-    .setAuthor({
-      name: npc.name,
-    });
+  let Embed = new EmbedBuilder().setColor(color).setAuthor({
+    name: interaction.message.embeds[0].author.name,
+  });
 
   messages?.forEach((message: Message) => {
     Embed.addFields({
       name: message.sender === "npc" ? npc.name : interaction.user.tag,
-      value: message.content,
+      value: message.content + "\n",
     });
   });
 
@@ -43,7 +40,7 @@ async function embedAnswer(
       .setCustomId("answer")
       .setPlaceholder(`Answer to ${npc.name}...`)
       .addOptions(
-        answer.choices.map((choice, index: number) => ({
+        choices.map((choice, index: number) => ({
           label: choice || "Failed to generate answer",
           value: choice || "Failed to generate answer",
           description:
@@ -52,9 +49,17 @@ async function embedAnswer(
       )
   );
 
+  const buttonRow: any = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel(`${npc.name} profile`)
+      .setURL(npcUrl)
+  );
+
   await interaction.followUp({
+    content: `<@${interaction.user.id}>`,
     embeds: [Embed],
-    components: [row],
+    components: [row, buttonRow],
   });
 }
 
@@ -62,16 +67,17 @@ module.exports = {
   id: "answer",
   async execute(interaction) {
     try {
-      console.log("shrek");
       await interaction.deferReply();
       let id = interaction.customId;
-
       let discordAnswer = interaction.values[0];
       let retrievedEmbed = interaction.message.embeds[0];
-      let npc = {
-        name: retrievedEmbed.author.name,
-        description: retrievedEmbed.description,
-      };
+      const contextId = retrievedEmbed.author.name;
+      let retrievedContext = await getContextFromEmbedAuthor(
+        contextId,
+        interaction
+      );
+      const { gameContext, npc, npcUrl } = retrievedContext;
+
       if (["answer"].includes(id)) id = "answer";
       let messages: Message[] = [];
       // retrieve messages from embed
@@ -82,23 +88,20 @@ module.exports = {
           content: field.value,
         });
       });
-      let prompt = NPC_QUESTION(TEST_GAME_CONTEXT, npc, messages);
-      const output = await interaction.client.npc3.generateAnswer({
-        prompt: prompt,
-      });
-      let answer = extractNPCAnswer(output);
       messages.push({ sender: "player", content: discordAnswer });
-      messages.push({ sender: "npc", content: answer.npc });
-
-      console.log(prompt);
-      console.log(output);
-      console.log(answer);
+      const approach = await interaction.client.npc3.discuss({
+        gameContext: gameContext,
+        npc: npc,
+        history: messages,
+      });
+      messages.push({ sender: "npc", content: approach.message });
       embedAnswer(
         npc,
-        answer,
+        approach.choices,
         interaction.message.embeds[0].color,
         interaction,
-        messages
+        messages,
+        npcUrl
       );
     } catch (err) {
       console.log(err);

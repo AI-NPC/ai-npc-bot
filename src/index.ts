@@ -14,4 +14,10 @@ readdirSync(handlersDir).forEach((handler) => {
   require(`${handlersDir}/${handler}`)(client);
 });
 
+client.functions = {
+  reply: require("./functions/reply"),
+  parseTxt: require("./functions/parseTxt"),
+  embedify: require("./functions/embedify"),
+};
+
 client.login(TOKEN);

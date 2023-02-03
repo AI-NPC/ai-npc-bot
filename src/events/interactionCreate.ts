@@ -11,7 +11,6 @@ const event: BotEvent = {
   name: Events.InteractionCreate,
   once: false,
   async execute(interaction) {
-    console.log(interaction.type);
     if (!interaction) return;
     if (interaction.type === InteractionType.ApplicationCommand) {
       const command: Command = interaction.client.commands.get(

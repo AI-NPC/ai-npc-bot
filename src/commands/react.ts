@@ -8,7 +8,7 @@ export const command: Command = {
     .setDescription("Envoie un message avec une réaction"),
   async execute(interaction) {
     const message = await interaction.reply({
-      content: "Message avec réaction",
+      content: "",
       fetchReply: true,
     });
     await message.react("👋");
