@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "dev": "nodemon",
-     "clean": "rm -rf dist",
+    "clean": "rm -rf dist",
     "build": "npm run clean && tsc  && cp -r src/assets dist",
     "start": "npm run build && node dist/index.js",
     "update-npc3": "npm install @ai-npc/npc3@latest --save"
@@ -27,7 +27,7 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@ai-npc/npc3": "^0.0.25",
+    "@ai-npc/npc3": "^0.0.26",
     "discord.js": "^14.6.0",
     "dotenv": "^16.0.3"
   }
