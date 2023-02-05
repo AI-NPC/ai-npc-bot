@@ -18,6 +18,7 @@ client.functions = {
   reply: require("./functions/reply"),
   parseTxt: require("./functions/parseTxt"),
   embedify: require("./functions/embedify"),
+  embedNPC: require("./functions/embedNPC"),
 };
 
 client.login(TOKEN);

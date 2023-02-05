@@ -8,6 +8,7 @@ import {
 } from "discord.js";
 import { ReplyFunction } from "./src/functions/reply";
 import { EmbedifyFunction } from "./src/functions/embedify";
+import { EmbedNPCFunction } from "./src/functions/embedNPC";
 
 export interface BotEvent {
   name: string;
@@ -19,6 +20,7 @@ export interface BotFunctions {
   reply: ReplyFunction;
   parseTxt: (txt: string) => string;
   embedify: EmbedifyFunction;
+  embedNPC: EmbedNPCFunction;
 }
 
 export interface Command {

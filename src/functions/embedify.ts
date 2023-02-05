@@ -3,12 +3,13 @@ import {
   EmbedFooterOptions,
   EmbedField,
   EmbedAuthorOptions,
+  ColorResolvable,
 } from "discord.js";
 
 export type EmbedifyOptions = {
   title?: string;
   description?: string;
-  color?: number;
+  color?: ColorResolvable;
   fields?: EmbedField[];
   thumbnail?: string;
   image?: string;

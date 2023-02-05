@@ -1,49 +1,8 @@
-import {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  CommandInteraction,
-} from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { Command } from "../../types";
-import { NPC, GameContext } from "@ai-npc/npc3";
-import { displayContext } from "../helpers/formats";
+import { NPC } from "@ai-npc/npc3";
 import { randomGameContext } from "../helpers/utils";
-
-async function embedNPC(
-  npcs: NPC[],
-  interaction: CommandInteraction,
-  gameContext: GameContext
-) {
-  let Embed = new EmbedBuilder()
-    .setColor("Random")
-    .setDescription(displayContext(gameContext))
-    .addFields({
-      name: npcs[0].name,
-      value: npcs[0].description,
-    })
-    .addFields({
-      name: npcs[1].name,
-      value: npcs[1].description,
-    });
-
-  const row: any = new ActionRowBuilder();
-
-  for (let i = 0; i <= 1; i++) {
-    row.addComponents(
-      new ButtonBuilder()
-        .setLabel(`Talk with ${npcs[i].name}`)
-        .setStyle(ButtonStyle.Primary)
-        .setCustomId(`talk-${i}`)
-    );
-  }
-  await interaction.followUp({
-    content: `<@${interaction.user.id}>`,
-    embeds: [Embed],
-    components: [row],
-  });
-}
+import BOT_CONFIG from "../config/bot";
 
 export const command: Command = {
   name: "create",
@@ -51,11 +10,27 @@ export const command: Command = {
     .setName("create")
     .setDescription("create 2 NPCs within a random game context"),
   async execute(interaction) {
-    await interaction.deferReply();
-    let gameContext = randomGameContext();
-    let npcs: NPC[] = await interaction.client.npc3.getTwoNPCs({
-      gameContext: gameContext,
-    });
-    await embedNPC(npcs, interaction, gameContext);
+    const { npc3, functions } = interaction.client;
+
+    try {
+      if (interaction.channel.parent.id !== BOT_CONFIG.parents.tests)
+        throw new Error("This command can only be used in the tests category");
+      let gameContext = randomGameContext();
+      await interaction.deferReply();
+      let npcs: NPC[] = await npc3.getTwoNPCs({
+        gameContext: gameContext,
+      });
+      let payload = functions.embedNPC({
+        npcs,
+        interaction,
+        gameContext,
+      });
+      await interaction.followUp(payload);
+    } catch (err) {
+      functions.reply.error({
+        interaction: interaction,
+        message: err.message,
+      });
+    }
   },
 };
