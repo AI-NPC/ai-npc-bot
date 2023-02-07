@@ -45,11 +45,16 @@ const event: BotEvent = {
           .setURL(BOT_CONFIG.links.docs)
           .setLabel("Read the documentation")
           .setStyle(ButtonStyle.Link)
-          .setEmoji("📖")
+          .setEmoji("📖"),
+        new ButtonBuilder()
+          .setLabel("Click here to test")
+          .setCustomId("create")
+          .setStyle(ButtonStyle.Primary)
+          .setEmoji("🧠")
       );
 
-      let alphaTester = guild.roles.cache.get(BOT_CONFIG.roles.alphaTester);
-      if (alphaTester) member.roles.add(alphaTester);
+      let alphaTester = await guild.roles.fetch(BOT_CONFIG.roles.alphaTester);
+      if (alphaTester) await member.roles.add(alphaTester);
 
       await channel.send({
         content: `Welcome to **${guild.name}** ${BOT_CONFIG.emoji}, <@${member.user.id}>!`,

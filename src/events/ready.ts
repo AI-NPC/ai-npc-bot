@@ -1,6 +1,7 @@
 import { NPC3 } from "@ai-npc/npc3";
 import { Client, Events, GuildMember } from "discord.js";
 import { BotEvent } from "../../types";
+import BOT_CONFIG from "../config/bot";
 import { ENVIRONMENT, OPENAI_API_KEY } from "../helpers/envs";
 
 const event: BotEvent = {
@@ -12,7 +13,7 @@ const event: BotEvent = {
     console.log(`💪 NPC3 initialized`);
 
     if (ENVIRONMENT === "development") {
-      const guild = await client.guilds.fetch("1069550778706034798");
+      const guild = await client.guilds.fetch(BOT_CONFIG.guildId);
       client.emit(
         "guildMemberAdd",
         (await guild?.members.fetch("777676813517455370")) as GuildMember

@@ -1,5 +1,5 @@
 import { getContextFromEmbedAuthor } from "./../../helpers/utils";
-import { Button, Select } from "../../../types";
+import { Select } from "../../../types";
 import {
   ColorResolvable,
   EmbedBuilder,
@@ -53,7 +53,12 @@ async function embedAnswer(
     new ButtonBuilder()
       .setStyle(ButtonStyle.Link)
       .setLabel(`${npc.name} profile`)
-      .setURL(npcUrl)
+      .setURL(npcUrl),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setLabel("Flag content")
+      .setEmoji("🚨")
+      .setCustomId("flag")
   );
 
   await interaction.followUp({

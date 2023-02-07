@@ -2,8 +2,14 @@ type BotConfig = {
   guildId: string;
   name: string;
   emoji: string;
-  channels: any;
-  testChannels: any;
+  channels: {
+    welcome: string;
+    aTest: string;
+  };
+  testChannels: {
+    welcome: string;
+    flag: string;
+  };
   roles: any;
   links: any;
   messages: any;
@@ -29,6 +35,7 @@ const BOT_CONFIG: BotConfig = {
   },
   testChannels: {
     welcome: "1069620594389307422",
+    flag: "1072462600182439997",
   },
   messages: {
     serverDescription: `<#1070423068926808074> to learn more about our project and mission
@@ -37,7 +44,10 @@ const BOT_CONFIG: BotConfig = {
         <#1071195508036616324> to engage in meaningful discussions about AI
         `,
     docs: (guildName: string, emoji: string) =>
-      `If you're looking to test **${guildName}** ${emoji}, you can use the \`\`/create\`\` command in any of the <#1070422574141550665> channels. This will create two NPCs for you to chat with in a random game context. We encourage you to give it a try and let us know your thoughts!`,
+      `If you're looking to test **${guildName}** ${emoji}, you can use the \`\`/create\`\` command in any of the <#1070422574141550665> channels.
+      This will create two NPCs for you to chat with in a random game context. We encourage you to give it a try and let us know your thoughts!
+      
+      If you find any weird answers (for example, the NPCs are not responding to your questions, or out of context), please report it by clicking the flag button 🚨 in the channel.`,
   },
 };
 

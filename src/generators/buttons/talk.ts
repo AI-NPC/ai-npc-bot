@@ -46,7 +46,12 @@ async function embedAnswer(
     new ButtonBuilder()
       .setStyle(ButtonStyle.Link)
       .setLabel(`${npc.name} profile`)
-      .setURL(interaction.message.url)
+      .setURL(interaction.message.url),
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Danger)
+      .setLabel("Flag content")
+      .setEmoji("🚨")
+      .setCustomId("flag")
   );
 
   await interaction.followUp({
